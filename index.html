@@ -1,0 +1,1635 @@
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    alabaster: '#FAF8F5',
+                    alabasterCard: '#FFFFFF',
+                    alabasterSoft: '#F3F0EA',
+                    forest: '#0D1F17',
+                    forestLight: '#183125',
+                    terracotta: '#C66A51',
+                    terracottaHover: '#B25A42',
+                    sage: '#7A9A8B',
+                    sageLight: '#E8EFEB',
+                    goldAccent: '#D4AF37',
+                    borderFine: '#E5E1D8'
+                },
+                fontFamily: {
+                    serif: ['Playfair Display', 'serif'],
+                    sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    mono: ['JetBrains Mono', 'monospace']
+                },
+                boxShadow: {
+                    'editorial': '0 20px 40px -15px rgba(13, 31, 23, 0.07)',
+                    'editorial-lg': '0 30px 60px -20px rgba(13, 31, 23, 0.12)',
+                    'glow-terracotta': '0 0 25px rgba(198, 106, 81, 0.25)',
+                    'glow-gold': '0 0 25px rgba(212, 175, 55, 0.3)'
+                }
+            }
+        }
+    }
+</script>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    body {
+        background-color: #FAF8F5;
+        color: #0D1F17;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        overflow-x: hidden;
+        user-select: none;
+    }
+
+    .fine-border { border: 1px solid #E5E1D8; }
+    .fine-border-b { border-bottom: 1px solid #E5E1D8; }
+    .fine-border-t { border-top: 1px solid #E5E1D8; }
+    
+    .glass-header {
+        background: rgba(250, 248, 245, 0.88);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .glass-dark {
+        background: rgba(13, 31, 23, 0.94);
+        backdrop-filter: blur(20px);
+        color: #FAF8F5;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(12px);
+        border: 1px solid #E5E1D8;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #FAF8F5; }
+    ::-webkit-scrollbar-thumb { background: #7A9A8B; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #C66A51; }
+
+    @keyframes laserSweep {
+        0% { top: 0%; opacity: 0.9; }
+        50% { top: 96%; opacity: 1; }
+        100% { top: 0%; opacity: 0.9; }
+    }
+    .animate-laser {
+        animation: laserSweep 2.4s ease-in-out infinite;
+    }
+
+    .tilt-card {
+        transform-style: preserve-3d;
+        transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    }
+
+    .hotspot-pulse {
+        animation: pingPulse 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    @keyframes pingPulse {
+        75%, 100% { transform: scale(2); opacity: 0; }
+    }
+</style>
+
+
+<!-- NAVIGATION BAR -->
+<header class="sticky top-0 z-40 w-full glass-header fine-border-b transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <!-- Brand Mark -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+            <div class="w-10 h-10 rounded-full bg-forest text-alabaster flex items-center justify-center shadow-md">
+                <i class="fa-solid fa-leaf text-terracotta text-base"></i>
+            </div>
+            <div>
+                <span class="font-serif text-2xl font-semibold tracking-tight text-forest block leading-none">PlantaCerta</span>
+                <span class="text-[9px] tracking-[0.25em] uppercase font-mono text-sage block mt-1">Botânica de Precisão</span>
+            </div>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="hidden lg:flex items-center space-x-8 text-xs font-medium uppercase tracking-widest text-forest/80">
+            <a href="#telemetria" onclick="playUiClick()" class="hover:text-terracotta transition-colors py-1 relative group">
+                Telemetria IoT
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-terracotta transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="#atelie-canvas" onclick="playUiClick()" class="hover:text-terracotta transition-colors py-1 relative group">
+                Ateliê Canvas 2D
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-terracotta transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="#diagnostico-ia" onclick="playUiClick()" class="hover:text-terracotta transition-colors py-1 relative group">
+                Diagnóstico IA
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-terracotta transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="#loja" onclick="playUiClick()" class="hover:text-terracotta transition-colors py-1 relative group">
+                Loja Botânica
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-terracotta transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="#avaliacoes" onclick="playUiClick()" class="hover:text-terracotta transition-colors py-1 relative group">
+                Depoimentos
+                <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-terracotta transition-all duration-300 group-hover:w-full"></span>
+            </a>
+        </nav>
+
+        <!-- Control Badges -->
+        <div class="flex items-center space-x-3">
+            <!-- Audio Synth Toggle Button -->
+            <button id="audioToggleBtn" onclick="toggleAudioSynth()" title="Sintetizador Web Audio API" class="w-10 h-10 rounded-full fine-border flex items-center justify-center text-forest hover:bg-forest hover:text-alabaster transition-all duration-200">
+                <i id="audioIcon" class="fa-solid fa-volume-high text-terracotta text-xs"></i>
+            </button>
+
+            <!-- Alerts Center Toggle -->
+            <button onclick="toggleAlertDrawer()" title="Central de Alertas IoT" class="relative w-10 h-10 rounded-full fine-border flex items-center justify-center text-forest hover:bg-forest hover:text-alabaster transition-all duration-200">
+                <i class="fa-regular fa-bell text-xs"></i>
+                <span id="alertBadge" class="absolute -top-1 -right-1 w-5 h-5 bg-terracotta text-white font-mono text-[9px] rounded-full flex items-center justify-center font-bold">1</span>
+            </button>
+
+            <!-- Shopping Cart Toggle -->
+            <button onclick="toggleCartDrawer()" title="Carrinho de Compras" class="relative w-10 h-10 rounded-full fine-border flex items-center justify-center text-forest hover:bg-forest hover:text-alabaster transition-all duration-200">
+                <i class="fa-solid fa-bag-shopping text-xs"></i>
+                <span id="cartBadge" class="absolute -top-1 -right-1 w-5 h-5 bg-forest text-alabaster font-mono text-[9px] rounded-full flex items-center justify-center font-bold">0</span>
+            </button>
+
+            <!-- User Profile -->
+            <button onclick="openModal('userModal')" class="hidden sm:flex items-center space-x-2 px-4 py-2.5 text-[10px] uppercase tracking-widest font-semibold rounded-full bg-forest text-alabaster hover:bg-forestLight transition-colors">
+                <i class="fa-regular fa-user"></i>
+                <span>Ateliê ID</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- HERO SECTION -->
+<section class="relative py-12 lg:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-7 space-y-6">
+            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full fine-border bg-alabasterCard text-terracotta text-[11px] font-mono shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-terracotta animate-pulse"></span>
+                <span>HARDWARE ESP32-S3 SENSOR MESH ATIVO</span>
+            </div>
+
+            <h1 class="font-serif text-4xl sm:text-6xl lg:text-7xl font-normal leading-[1.1] text-forest">
+                Cultivo de Precisão com <em class="italic font-light text-terracotta">Interatividade</em> Viva.
+            </h1>
+
+            <p class="text-forest/70 text-base sm:text-lg max-w-2xl font-light leading-relaxed">
+                Arraste folhagens com física de molas, mova orbes solares para fototropismo, acione irrigação fluida e inspecione lesões com inteligência artificial.
+            </p>
+
+            <div class="pt-2 flex flex-wrap items-center gap-4">
+                <a href="#atelie-canvas" onclick="playUiClick()" class="px-8 py-4 bg-forest text-alabaster text-xs uppercase tracking-widest font-semibold rounded-xl hover:bg-terracotta transition-all duration-300 shadow-editorial flex items-center space-x-3">
+                    <i class="fa-solid fa-hand-pointer text-terracotta"></i>
+                    <span>Laboratório Interativo</span>
+                </a>
+                <a href="#telemetria" onclick="playUiClick()" class="px-8 py-4 fine-border text-forest text-xs uppercase tracking-widest font-semibold rounded-xl hover:border-forest transition-colors flex items-center space-x-2 bg-white/50">
+                    <i class="fa-solid fa-microchip text-sage"></i>
+                    <span>Painel Telemetria</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Featured Live Plant Node -->
+        <div class="lg:col-span-5">
+            <div class="relative rounded-3xl overflow-hidden glass-card p-6 shadow-editorial-lg border border-terracotta/20">
+                <div class="aspect-[4/5] rounded-2xl overflow-hidden relative group cursor-pointer" onclick="scrollToCanvasAndFocus()">
+                    <img src="https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=1000&q=80" alt="Monstera Deliciosa Ateliê" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/20 to-transparent"></div>
+
+                    <!-- Live Telemetry Overlay Badge -->
+                    <div class="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 text-white font-mono text-[10px] flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span>NODE SIMULADO #01</span>
+                    </div>
+
+                    <div class="absolute bottom-4 left-4 right-4 glass-dark p-4 rounded-xl text-xs space-y-2 font-mono border border-white/10">
+                        <div class="flex justify-between items-center border-b border-white/10 pb-2">
+                            <span class="text-sage text-[11px]"><i class="fa-solid fa-seedling text-terracotta mr-1.5"></i> Monstera Deliciosa</span>
+                            <span class="text-emerald-400 font-bold text-[10px]">PUB/SUB OK</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center pt-1">
+                            <div>
+                                <span class="text-white/50 block text-[9px] uppercase">Umidade</span>
+                                <span id="heroMoistureDisplay" class="text-sm font-bold text-alabaster">68%</span>
+                            </div>
+                            <div>
+                                <span class="text-white/50 block text-[9px] uppercase">Temp</span>
+                                <span id="heroTempDisplay" class="text-sm font-bold text-alabaster">22.8°C</span>
+                            </div>
+                            <div>
+                                <span class="text-white/50 block text-[9px] uppercase">Lux Solar</span>
+                                <span id="heroLuxDisplay" class="text-sm font-bold text-goldAccent">4,500 Ix</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 1: IoT TELEMETRY DASHBOARD -->
+<section id="telemetria" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-4 fine-border-b">
+        <div>
+            <span class="text-[11px] uppercase font-mono tracking-widest text-terracotta block">Sensores Mesh ESP32</span>
+            <h2 class="font-serif text-3xl sm:text-4xl font-normal text-forest mt-1">Telemetria de Jardim de Precisão</h2>
+        </div>
+        <div class="mt-4 md:mt-0 flex items-center space-x-3">
+            <button onclick="toggleTelemetryStream()" id="streamToggleBtn" class="px-4 py-2.5 bg-forest/5 fine-border text-forest text-xs font-mono font-bold rounded-xl hover:bg-forest hover:text-alabaster transition-colors flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="streamStatusText">Stream em Tempo Real: ATIVO</span>
+            </button>
+            <button onclick="openModal('addPlantModal'); playUiClick();" class="px-5 py-2.5 bg-terracotta text-white text-xs uppercase tracking-wider font-semibold rounded-xl hover:bg-terracottaHover transition-colors shadow-sm flex items-center space-x-2">
+                <i class="fa-solid fa-plus text-xs"></i>
+                <span>Cadastrar Exemplar</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Plants Dynamic Grid -->
+    <div id="plantGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Rendered via JavaScript -->
+    </div>
+</section>
+
+<!-- FLOATING ESP32 HARDWARE SIMULATOR BAR -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 w-11/12 max-w-4xl glass-dark p-4 rounded-2xl shadow-editorial-lg border border-white/10 text-alabaster transition-all duration-300">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-3 w-full md:w-auto">
+            <div class="w-9 h-9 rounded-xl bg-terracotta/20 border border-terracotta/50 text-terracotta flex items-center justify-center font-mono text-xs font-bold">
+                IoT
+            </div>
+            <div>
+                <h4 class="text-xs font-mono font-bold tracking-wider text-alabaster uppercase">Emulador Hardware Global</h4>
+                <p class="text-[10px] text-sage">Altere os potenciômetros simulados</p>
+            </div>
+        </div>
+
+        <!-- Global Hardware Sliders -->
+        <div class="flex flex-1 items-center space-x-6 w-full md:w-auto px-2">
+            <div class="flex-1 space-y-1">
+                <div class="flex justify-between text-[11px] font-mono">
+                    <span class="text-white/70">Solo (Umidade)</span>
+                    <span id="simMoistureValue" class="text-terracotta font-bold">68%</span>
+                </div>
+                <input type="range" id="simMoistureSlider" min="0" max="100" value="68" oninput="document.getElementById('simMoistureValue').innerText = this.value + '% (simulação)'" class="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-terracotta">
+            </div>
+            
+            <div class="flex-1 space-y-1">
+                <div class="flex justify-between text-[11px] font-mono">
+                    <span class="text-white/70">Iluminação (Lux)</span>
+                    <span id="simLightValue" class="text-goldAccent font-bold">4500 Ix</span>
+                </div>
+                <input type="range" id="simLightSlider" min="100" max="10000" value="4500" oninput="updateLightSimulation(this.value)" class="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-goldAccent">
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-2 w-full md:w-auto">
+            <div class="text-[10px] font-mono text-center text-white/80">Bomba: <strong id="pumpStatusText">AGUARDANDO FIREBASE</strong></div>
+            <div class="flex gap-2">
+                <button onclick="triggerGlobalIrrigation()" class="flex-1 px-4 py-2.5 bg-terracotta text-white rounded-xl text-xs font-mono uppercase font-bold hover:bg-terracottaHover transition-all flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i><span>Ligar</span></button>
+                <button onclick="desligarBombaInterface()" class="flex-1 px-4 py-2.5 bg-white text-forest rounded-xl text-xs font-mono uppercase font-bold hover:bg-sageLight transition-all flex items-center justify-center gap-2"><i class="fa-solid fa-stop"></i><span>Desligar</span></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 2: INTERACTIVE BOTANICAL CANVAS (PHYSICS & PHOTOTROPISM) -->
+<section id="atelie-canvas" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="glass-card rounded-3xl p-6 sm:p-10 shadow-editorial border border-sage/20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            
+            <!-- Canvas Display Frame -->
+            <div class="lg:col-span-7 flex flex-col items-center justify-center bg-alabasterSoft/70 rounded-2xl p-6 fine-border relative overflow-hidden min-h-[480px]">
+                <div class="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
+                    <span class="font-mono text-[10px] uppercase tracking-widest text-forest/70 fine-border bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
+                        <i class="fa-solid fa-hand-pointer text-terracotta mr-1"></i> Arraste os Galhos / Mova o Sol
+                    </span>
+                    <span class="font-mono text-[10px] text-terracotta font-bold bg-terracotta/10 px-2.5 py-1 rounded-full">
+                        FÍSICA DE MOLAS ATIVA
+                    </span>
+                </div>
+
+                <!-- Canvas Interactive Surface -->
+                <canvas id="botanicalCanvas" width="460" height="460" class="max-w-full h-auto cursor-grab active:cursor-grabbing"></canvas>
+
+                <!-- Real-time Cell Mechanics Footer -->
+                <div class="absolute bottom-4 left-4 right-4 flex flex-wrap justify-between items-center text-xs font-mono text-forest/80 bg-white/90 backdrop-blur-md p-3.5 rounded-xl fine-border gap-2">
+                    <span>Estado Foliar: <strong id="canvasLeafStatus" class="text-emerald-700">Turgida & Saúdavel</strong></span>
+                    <span>Fator Turgor: <strong id="canvasTurgorDisplay" class="text-forest">0.96</strong></span>
+                    <span>Fototropismo: <strong id="canvasLightAngle" class="text-goldAccent">+12° Sun Angle</strong></span>
+                </div>
+            </div>
+
+            <!-- Control Station -->
+            <div class="lg:col-span-5 space-y-6">
+                <div>
+                    <span class="text-[11px] uppercase font-mono tracking-widest text-terracotta block">Laboratório Botânico 2D</span>
+                    <h3 class="font-serif text-3xl font-normal text-forest mt-1">Interatividade e Fototropismo</h3>
+                    <p class="text-forest/70 text-sm mt-2 font-light leading-relaxed">
+                        Arraste a estrutura foliar para testar a resiliência elástica. Clique em galhos individuais para podar ou use as borrifadas físicas de macronutrientes.
+                    </p>
+                </div>
+
+                <!-- Physics Action Buttons -->
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="interactCanvas('water')" class="p-4 rounded-2xl bg-white fine-border hover:border-terracotta text-center transition-all group shadow-sm hover:shadow-md">
+                        <i class="fa-solid fa-cloud-rain text-2xl text-blue-500 group-hover:scale-110 transition-transform block mb-2"></i>
+                        <span class="text-xs font-semibold text-forest block">Borrifar Água</span>
+                        <span class="text-[10px] text-sage block font-mono mt-1">+ Fluidos</span>
+                    </button>
+
+                    <button onclick="interactCanvas('fertilize')" class="p-4 rounded-2xl bg-white fine-border hover:border-terracotta text-center transition-all group shadow-sm hover:shadow-md">
+                        <i class="fa-solid fa-wand-magic-sparkles text-2xl text-amber-500 group-hover:scale-110 transition-transform block mb-2"></i>
+                        <span class="text-xs font-semibold text-forest block">Adubar Solo</span>
+                        <span class="text-[10px] text-sage block font-mono mt-1">+ N-P-K Gold</span>
+                    </button>
+
+                    <button onclick="interactCanvas('prune')" class="p-4 rounded-2xl bg-white fine-border hover:border-terracotta text-center transition-all group shadow-sm hover:shadow-md">
+                        <i class="fa-solid fa-scissors text-2xl text-terracotta group-hover:scale-110 transition-transform block mb-2"></i>
+                        <span class="text-xs font-semibold text-forest block">Podar Galhos</span>
+                        <span class="text-[10px] text-sage block font-mono mt-1">Corte Físico</span>
+                    </button>
+                </div>
+
+                <!-- Ambient Sun Position Controller Slider -->
+                <div class="p-5 rounded-2xl bg-white fine-border space-y-3">
+                    <div class="flex justify-between items-center font-mono text-xs">
+                        <span class="text-forest font-semibold"><i class="fa-solid fa-sun text-goldAccent mr-1.5"></i> Posicionamento Solar (Fototropismo)</span>
+                        <span id="sunPosLabel" class="text-goldAccent font-bold">120° Azimute</span>
+                    </div>
+                    <input type="range" id="sunPosSlider" min="20" max="440" value="120" oninput="updateSunPosition(this.value)" class="w-full h-2 bg-sageLight rounded-lg appearance-none cursor-pointer accent-goldAccent">
+                    <p class="text-[11px] text-forest/60 font-light">
+                        Mova a fonte luminosa para observar as hastes vegetais curvando-se organicamente na direção do fóton.
+                    </p>
+                </div>
+
+                <!-- 30-Day Predictive Stress Timeline Slider -->
+                <div class="p-5 rounded-2xl bg-white fine-border space-y-3">
+                    <div class="flex justify-between items-center font-mono text-xs">
+                        <span class="text-forest font-semibold"><i class="fa-solid fa-clock-rotate-left text-terracotta mr-1.5"></i> Simulador Estresse (30 Dias)</span>
+                        <span id="timelineDayLabel" class="text-terracotta font-bold">Dia 0 (Turgida)</span>
+                    </div>
+                    <input type="range" id="timelineSlider" min="0" max="30" value="0" oninput="updateTimelinePrediction(this.value)" class="w-full h-2 bg-sageLight rounded-lg appearance-none cursor-pointer accent-terracotta">
+                    <p id="timelineDescription" class="text-[11px] text-forest/70 font-light">
+                        Células parenquimáticas hidratadas mantendo sustentação mecânica ideal.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 3: AI COMPUTER VISION DIAGNOSTIC SCANNER -->
+<section id="diagnostico-ia" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <div class="lg:col-span-5 space-y-5">
+            <span class="text-[11px] uppercase font-mono tracking-widest text-terracotta block">Inteligência Artificial Botânica</span>
+            <h2 class="font-serif text-3xl sm:text-4xl font-normal text-forest">Diagnósticos por Fotografia & Hotspots</h2>
+            <p class="text-forest/70 text-sm sm:text-base font-light leading-relaxed">
+                Nossa rede neural examina pigmentos e lesões na epiderme foliar. Selecione amostras de teste ou envie uma foto para detectar precocemente cloroses e pragas.
+            </p>
+
+            <!-- Sample Presets -->
+            <div class="space-y-2">
+                <span class="text-xs font-mono text-sage uppercase tracking-wider block">Amostras de Teste Rápidas:</span>
+                <div class="flex gap-3">
+                    <button onclick="loadScannerSample('sample1')" class="px-3.5 py-2 bg-white fine-border hover:border-terracotta rounded-xl text-xs font-mono text-forest flex items-center space-x-2 transition-colors">
+                        <i class="fa-solid fa-bug text-terracotta"></i>
+                        <span>Clorose Magnesiana</span>
+                    </button>
+                    <button onclick="loadScannerSample('sample2')" class="px-3.5 py-2 bg-white fine-border hover:border-terracotta rounded-xl text-xs font-mono text-forest flex items-center space-x-2 transition-colors">
+                        <i class="fa-solid fa-droplet-slash text-amber-600"></i>
+                        <span>Nosema Foliar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload & Scan Frame with Hotspots -->
+        <div class="lg:col-span-7">
+            <div class="glass-card rounded-3xl p-6 shadow-editorial relative overflow-hidden">
+                <div id="scannerDropzone" onclick="triggerPhotoUpload()" class="border-2 border-dashed border-sage/40 hover:border-terracotta rounded-2xl p-6 text-center cursor-pointer transition-colors relative min-h-[350px] flex flex-col items-center justify-center bg-alabaster/40">
+                    <input type="file" id="leafFileInput" class="hidden" accept="image/*" onchange="handleLeafUpload(event)">
+
+                    <!-- Initial Placeholder -->
+                    <div id="uploadPlaceholder" class="space-y-3">
+                        <div class="w-16 h-16 rounded-full bg-terracotta/10 text-terracotta mx-auto flex items-center justify-center text-2xl">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-forest">Clique para carregar ou escolha uma amostra</p>
+                            <p class="text-xs text-sage font-mono mt-1">Visão Computacional PlantaCerta Neural v4</p>
+                        </div>
+                        <button class="px-5 py-2.5 bg-forest text-alabaster text-xs rounded-xl uppercase tracking-widest font-semibold shadow-sm">Selecionar Imagem</button>
+                    </div>
+
+                    <!-- Interactive Scan Surface -->
+                    <div id="scanPreviewContainer" class="hidden absolute inset-0 w-full h-full bg-black/90 rounded-2xl overflow-hidden flex items-center justify-center">
+                        <img id="scanPreviewImg" src="" alt="Folha em Análise" class="w-full h-full object-cover">
+                        <div id="laserBeam" class="hidden absolute left-0 right-0 h-1 bg-terracotta shadow-[0_0_25px_#C66A51] animate-laser z-10"></div>
+
+                        <!-- Clickable Lesion Hotspot Pin #1 -->
+                        <div id="lesionHotspot1" onclick="selectHotspot(1, event)" class="hidden absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer group">
+                            <span class="absolute -inset-2 rounded-full bg-terracotta/40 hotspot-pulse"></span>
+                            <div class="w-6 h-6 rounded-full bg-terracotta text-white flex items-center justify-center font-mono text-[10px] font-bold border-2 border-white shadow-lg">1</div>
+                        </div>
+
+                        <!-- Clickable Lesion Hotspot Pin #2 -->
+                        <div id="lesionHotspot2" onclick="selectHotspot(2, event)" class="hidden absolute bottom-1/3 right-1/3 z-20 cursor-pointer group">
+                            <span class="absolute -inset-2 rounded-full bg-amber-500/40 hotspot-pulse"></span>
+                            <div class="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center font-mono text-[10px] font-bold border-2 border-white shadow-lg">2</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pathology Result Panel -->
+                <div id="scanResultPanel" class="hidden mt-6 p-6 rounded-2xl bg-forest text-alabaster space-y-4">
+                    <div class="flex justify-between items-center border-b border-white/10 pb-3">
+                        <div>
+                            <span id="diagTitle" class="font-serif text-lg font-bold text-terracotta block">Laudo Fitossanitário</span>
+                            <span class="text-[10px] font-mono text-sage">Clique nos números piscantes na foto para inspecionar as lesões</span>
+                        </div>
+                        <span id="healthPercentBadge" class="px-3 py-1 bg-emerald-500/20 text-emerald-300 font-mono text-xs rounded-full border border-emerald-500/40">Precisão: 98.4%</span>
+                    </div>
+
+                    <div class="space-y-2 text-xs font-mono bg-white/5 p-4 rounded-xl border border-white/10">
+                        <p><strong class="text-sage">Diagnóstico Principal:</strong> <span id="diagIssueText" class="text-alabaster font-semibold">Clorose Interveinal por Deficiência de Mg²⁺</span></p>
+                        <p><strong class="text-sage">Tratamento Recomendado:</strong> <span id="diagTreatmentText" class="text-alabaster">Aplicações foliares de Sulfato de Magnésio 2% quinzenal.</span></p>
+                    </div>
+
+                    <button onclick="resetScanner()" class="w-full py-2.5 bg-terracotta text-white font-mono text-xs uppercase tracking-wider rounded-xl font-bold hover:bg-terracottaHover transition-colors">Realizar Nova Análise</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 4: LUXURY BOTANICAL BOUTIQUE -->
+<section id="loja" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-4 fine-border-b">
+        <div>
+            <span class="text-[11px] uppercase font-mono tracking-widest text-terracotta block">Ateliê Hardware & Espécimes</span>
+            <h2 class="font-serif text-3xl sm:text-4xl font-normal text-forest mt-1">Loja Curada PlantaCerta</h2>
+        </div>
+
+        <!-- Categories Filter -->
+        <div class="mt-4 md:mt-0 flex flex-wrap gap-2">
+            <button onclick="filterProducts('all', this)" class="px-4 py-2 rounded-full text-xs font-mono font-medium bg-forest text-alabaster product-tab">Todos</button>
+            <button onclick="filterProducts('iot', this)" class="px-4 py-2 rounded-full text-xs font-mono font-medium fine-border text-forest hover:bg-forest hover:text-alabaster transition-colors product-tab">Vasos IoT</button>
+            <button onclick="filterProducts('plants', this)" class="px-4 py-2 rounded-full text-xs font-mono font-medium fine-border text-forest hover:bg-forest hover:text-alabaster transition-colors product-tab">Espécimes Raros</button>
+            <button onclick="filterProducts('care', this)" class="px-4 py-2 rounded-full text-xs font-mono font-medium fine-border text-forest hover:bg-forest hover:text-alabaster transition-colors product-tab">Insumos</button>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Dynamic Product Items -->
+    </div>
+</section>
+
+<!-- SECTION 5: REVIEWS & COMMUNITY -->
+<section id="avaliacoes" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="glass-card rounded-3xl p-6 sm:p-10 shadow-editorial">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div class="lg:col-span-5 space-y-6">
+                <div>
+                    <span class="text-[11px] uppercase font-mono tracking-widest text-terracotta block">Comunidade & Depoimentos</span>
+                    <h2 class="font-serif text-3xl font-normal text-forest mt-1">Experiência dos Cultivadores</h2>
+                    <div class="flex items-center space-x-2 mt-3">
+                        <div class="flex text-amber-500 text-sm">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <span class="text-sm font-bold text-forest">4.98 / 5.0</span>
+                        <span class="text-xs text-sage font-mono">(184 avaliações)</span>
+                    </div>
+                </div>
+
+                <!-- Review Interactive Form -->
+                <form onsubmit="submitReview(event)" class="space-y-4 bg-alabasterSoft/60 p-5 rounded-2xl fine-border">
+                    <h4 class="text-xs uppercase font-mono tracking-wider font-bold text-forest">Deixe seu Registro</h4>
+                    <div>
+                        <input type="text" id="reviewAuthor" required placeholder="Seu Nome / Nome do Ateliê" class="w-full px-3.5 py-2.5 bg-white rounded-xl fine-border text-xs focus:outline-none focus:border-terracotta">
+                    </div>
+                    
+                    <!-- Interactive Star Picker -->
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-mono text-sage">Sua Nota:</span>
+                        <div class="flex space-x-1 text-amber-400 cursor-pointer text-lg" id="starPicker">
+                            <i class="fa-solid fa-star" onclick="setStarRating(1)"></i>
+                            <i class="fa-solid fa-star" onclick="setStarRating(2)"></i>
+                            <i class="fa-solid fa-star" onclick="setStarRating(3)"></i>
+                            <i class="fa-solid fa-star" onclick="setStarRating(4)"></i>
+                            <i class="fa-solid fa-star" onclick="setStarRating(5)"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <textarea id="reviewText" required rows="3" placeholder="Compartilhe como a telemetria do PlantaCerta transformou seu espaço..." class="w-full px-3.5 py-2.5 bg-white rounded-xl fine-border text-xs focus:outline-none focus:border-terracotta"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-forest text-alabaster text-xs font-mono uppercase tracking-wider rounded-xl font-bold hover:bg-forestLight transition-colors">Publicar Depoimento</button>
+                </form>
+            </div>
+
+            <!-- Review Feed -->
+            <div class="lg:col-span-7 space-y-4 max-h-[500px] overflow-y-auto pr-2" id="reviewsFeed">
+                <!-- Dynamic Reviews -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-forest text-alabaster py-12 fine-border-t mt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-full bg-terracotta text-white flex items-center justify-center font-serif text-sm">
+                <i class="fa-solid fa-leaf"></i>
+            </div>
+            <span class="font-serif text-2xl font-semibold">PlantaCerta</span>
+        </div>
+        <p class="text-xs font-mono text-sage text-center">
+            © 2026 PlantaCerta Ateliê Botânico. Sistema de Precisão & Automação IoT.
+        </p>
+        <div class="flex space-x-4 text-sage text-sm">
+            <a href="#" class="hover:text-terracotta transition-colors"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="hover:text-terracotta transition-colors"><i class="fa-brands fa-github"></i></a>
+            <a href="#" class="hover:text-terracotta transition-colors"><i class="fa-solid fa-envelope"></i></a>
+        </div>
+    </div>
+</footer>
+
+<!-- SLIDE-OVER ALERT DRAWER -->
+<div id="alertDrawer" class="fixed inset-0 z-50 overflow-hidden hidden">
+    <div class="absolute inset-0 bg-forest/40 backdrop-blur-sm transition-opacity" onclick="toggleAlertDrawer()"></div>
+    <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+        <div class="pointer-events-auto w-screen max-w-md glass-dark p-6 shadow-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-bell text-terracotta"></i>
+                        <h3 class="font-serif text-lg font-bold text-alabaster">Central de Alertas IoT</h3>
+                    </div>
+                    <button onclick="toggleAlertDrawer()" class="text-white/60 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+
+                <div id="alertsList" class="mt-6 space-y-4">
+                    <!-- Dynamic Alert Items -->
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-4 text-center">
+                <span class="text-[10px] font-mono text-sage">Protocolo Mesh ESP-NOW OK</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CART DRAWER -->
+<div id="cartDrawer" class="fixed inset-0 z-50 overflow-hidden hidden">
+    <div class="absolute inset-0 bg-forest/40 backdrop-blur-sm" onclick="toggleCartDrawer()"></div>
+    <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+        <div class="pointer-events-auto w-screen max-w-md bg-alabaster p-6 shadow-2xl flex flex-col justify-between text-forest">
+            <div>
+                <div class="flex items-center justify-between fine-border-b pb-4">
+                    <h3 class="font-serif text-xl font-bold">Carrinho Ateliê</h3>
+                    <button onclick="toggleCartDrawer()" class="text-forest/60 hover:text-forest"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+
+                <!-- Shipping Meter -->
+                <div class="my-4 p-3.5 bg-sageLight/70 rounded-xl space-y-2">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span id="shippingText">Faltam R$ 150,00 para Frete Grátis</span>
+                        <i class="fa-solid fa-truck-fast text-terracotta"></i>
+                    </div>
+                    <div class="w-full h-1.5 bg-white rounded-full overflow-hidden">
+                        <div id="shippingProgressBar" class="h-full bg-terracotta w-1/2 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Cart List -->
+                <div id="cartItemsList" class="space-y-3 max-h-[360px] overflow-y-auto my-4 pr-1">
+                    <!-- Cart items -->
+                </div>
+            </div>
+
+            <div class="fine-border-t pt-4 space-y-3 font-mono">
+                <div class="flex justify-between text-sm">
+                    <span>Total Pedido</span>
+                    <strong id="cartTotalDisplay" class="text-lg font-bold text-terracotta">R$ 0,00</strong>
+                </div>
+                <button onclick="openCheckoutModal()" class="w-full py-3 bg-terracotta text-white font-mono text-xs uppercase tracking-widest font-bold rounded-xl hover:bg-terracottaHover transition-colors">
+                    Ir para Pagamento Pix
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: ADD PLANT -->
+<div id="addPlantModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-forest/60 backdrop-blur-sm hidden">
+    <div class="glass-card max-w-md w-full p-6 rounded-3xl shadow-editorial space-y-4">
+        <div class="flex justify-between items-center fine-border-b pb-3">
+            <h3 class="font-serif text-xl font-bold text-forest">Cadastrar Vaso / Node IoT</h3>
+            <button onclick="closeModal('addPlantModal')" class="text-forest/60 hover:text-forest"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form onsubmit="addNewPlant(event)" class="space-y-3 text-xs font-mono">
+            <div>
+                <label class="block mb-1 text-forest">Nome do Exemplar</label>
+                <input type="text" id="newPlantName" required placeholder="Ex: Ficus Lyrata Ateliê" class="w-full px-3 py-2 bg-white rounded-xl fine-border">
+            </div>
+            <div>
+                <label class="block mb-1 text-forest">Espécie Botânica</label>
+                <input type="text" id="newPlantSpecies" required placeholder="Ex: Ficus lyrata" class="w-full px-3 py-2 bg-white rounded-xl fine-border">
+            </div>
+            <div>
+                <label class="block mb-1 text-forest">ID Dispositivo ESP32</label>
+                <input type="text" id="newPlantEspId" required placeholder="ESP32-NODE-04" class="w-full px-3 py-2 bg-white rounded-xl fine-border">
+            </div>
+            <div>
+                <label class="block mb-1 text-forest">URL Imagem</label>
+                <input type="url" id="newPlantImg" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 bg-white rounded-xl fine-border">
+            </div>
+            <button type="submit" class="w-full py-3 bg-terracotta text-white uppercase font-bold rounded-xl hover:bg-terracottaHover transition-colors mt-2">Salvar Exemplar</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: TELEMETRY CHART -->
+<div id="chartModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-forest/60 backdrop-blur-sm hidden">
+    <div class="glass-card max-w-2xl w-full p-6 rounded-3xl shadow-editorial space-y-4">
+        <div class="flex justify-between items-center fine-border-b pb-3">
+            <div>
+                <h3 id="chartModalTitle" class="font-serif text-xl font-bold text-forest">Histórico de Telemetria</h3>
+                <span class="text-xs font-mono text-sage">Valores atualizados via MQTT</span>
+            </div>
+            <button onclick="closeModal('chartModal')" class="text-forest/60 hover:text-forest"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="h-64 w-full">
+            <canvas id="telemetryChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: USER PROFILE -->
+<div id="userModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-forest/60 backdrop-blur-sm hidden">
+    <div class="glass-card max-w-sm w-full p-6 rounded-3xl shadow-editorial space-y-4 text-center">
+        <div class="w-20 h-20 rounded-full bg-forest text-alabaster mx-auto flex items-center justify-center font-serif text-3xl shadow-md">
+            <i class="fa-solid fa-user-gear text-terracotta"></i>
+        </div>
+        <div>
+            <h3 class="font-serif text-xl font-bold text-forest">Ateliê #4092</h3>
+            <p class="text-xs font-mono text-sage mt-1">Nível: Jardineiro de Precisão</p>
+        </div>
+        <div class="bg-alabasterSoft p-3.5 rounded-2xl text-xs font-mono space-y-1 text-left fine-border">
+            <p><strong>Dispositivos Mapeados:</strong> 3 Nodes</p>
+            <p><strong>Status da Mesh:</strong> 100% Operacional</p>
+        </div>
+        <button onclick="closeModal('userModal')" class="w-full py-2.5 bg-forest text-alabaster text-xs font-mono uppercase font-bold rounded-xl">Fechar</button>
+    </div>
+</div>
+
+<!-- MODAL: PIX CHECKOUT -->
+<div id="checkoutModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-forest/60 backdrop-blur-sm hidden">
+    <div class="glass-card max-w-md w-full p-6 rounded-3xl shadow-editorial space-y-4 text-center">
+        <h3 class="font-serif text-xl font-bold text-forest">Pagamento Instantâneo Pix</h3>
+        <p class="text-xs font-mono text-sage">Escaneie o código para baixa automática do pedido</p>
+
+        <div class="bg-white p-4 rounded-2xl fine-border inline-block mx-auto shadow-inner relative">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=PlantaCertaAtelieCheckoutSimulated" alt="QR Code Pix" class="w-44 h-44">
+        </div>
+
+        <div class="text-[11px] font-mono bg-alabasterSoft p-3 rounded-xl fine-border break-all flex justify-between items-center">
+            <span class="truncate mr-2">00020126580014br.gov.bcb.pix0136plantacerta</span>
+            <button onclick="copyPixCode()" class="text-terracotta font-bold hover:underline">Copiar</button>
+        </div>
+
+        <button onclick="confirmOrder()" class="w-full py-3 bg-emerald-700 text-white font-mono text-xs uppercase tracking-wider font-bold rounded-xl hover:bg-emerald-800 transition-colors">
+            <i class="fa-solid fa-check mr-1.5"></i> Confirmar Pagamento
+        </button>
+    </div>
+</div>
+
+<!-- JAVASCRIPT PRINCIPAL DA APLICAÇÃO -->
+<script>
+    /* ==========================================================================
+       STATE & DATA ARCHITECTURE
+       ========================================================================== */
+    let plants = [
+        {
+            id: 1,
+            name: 'Monstera Deliciosa',
+            species: 'Monstera deliciosa',
+            espId: 'ESP32-NODE-01',
+            moisture: 68,
+            temp: 22.8,
+            light: 4500,
+            battery: 96,
+            image: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=800&q=80'
+        },
+        {
+            id: 2,
+            name: 'Ficus Lyrata Ateliê',
+            species: 'Ficus lyrata',
+            espId: 'ESP32-NODE-02',
+            moisture: 18,
+            temp: 24.3,
+            light: 5900,
+            battery: 82,
+            image: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=800&q=80'
+        },
+        {
+            id: 3,
+            name: 'Jiboia Holandesa',
+            species: 'Epipremnum pinnatum',
+            espId: 'ESP32-NODE-03',
+            moisture: 54,
+            temp: 21.5,
+            light: 3100,
+            battery: 90,
+            image: 'https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&w=800&q=80'
+        }
+    ];
+
+    let products = [
+        { id: 101, name: 'Vaso Botânico IoT Terracota v2', category: 'iot', price: 349.00, image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=600&q=80' },
+        { id: 102, name: 'Monstera Variegata Rara', category: 'plants', price: 290.00, image: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=600&q=80' },
+        { id: 103, name: 'Nutrientes Orgânicos Ateliê 500ml', category: 'care', price: 65.00, image: 'https://images.unsplash.com/photo-1585336261026-8f5786372969?auto=format&fit=crop&w=600&q=80' },
+        { id: 104, name: 'Sensor Solo Capacitivo Pro ESP32', category: 'iot', price: 125.00, image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80' }
+    ];
+
+    let cart = [];
+    let alerts = []; // Alertas reais são alimentados pela leitura do Firebase.
+
+    let reviews = [
+        { id: 1, author: 'Helena S. (Ateliê SP)', rating: 5, text: 'A estética minimalista e o feedback auditivo da rega deixam a experiência mágica.' },
+        { id: 2, author: 'Dr. Lucas V. (Botânica)', rating: 5, text: 'A física de molas dos galhos no canvas e o fototropismo funcionam de forma exemplar.' }
+    ];
+
+    let selectedRating = 5;
+    let isStreamingActive = true;
+    let chartInstance = null;
+    let audioCtx = null;
+    let audioEnabled = true;
+
+    /* ==========================================================================
+       WEB AUDIO API SYNTHESIZER
+       ========================================================================== */
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function playSynthSound(type) {
+        if (!audioEnabled) return;
+        initAudio();
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'water') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400 + Math.random() * 200, now);
+            osc.frequency.exponentialRampToValueAtTime(800 + Math.random() * 300, now + 0.2);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        } else if (type === 'fertilize') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now + 0.08);
+            osc.frequency.setValueAtTime(783.99, now + 0.16);
+            gain.gain.setValueAtTime(0.06, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'prune') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(1200, now);
+            osc.frequency.exponentialRampToValueAtTime(100, now + 0.08);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+            osc.start(now);
+            osc.stop(now + 0.08);
+        } else if (type === 'pop') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.exponentialRampToValueAtTime(200, now + 0.04);
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+            osc.start(now);
+            osc.stop(now + 0.04);
+        } else if (type === 'scan') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.linearRampToValueAtTime(900, now + 0.4);
+            gain.gain.setValueAtTime(0.06, now);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.4);
+            osc.start(now);
+            osc.stop(now + 0.4);
+        }
+    }
+
+    function playUiClick() {
+        playSynthSound('pop');
+    }
+
+    function toggleAudioSynth() {
+        audioEnabled = !audioEnabled;
+        const icon = document.getElementById('audioIcon');
+        if (audioEnabled) {
+            icon.className = 'fa-solid fa-volume-high text-terracotta text-xs';
+            playSynthSound('pop');
+        } else {
+            icon.className = 'fa-solid fa-volume-xmark text-xs text-forest/40';
+        }
+    }
+
+    /* ==========================================================================
+       INTERACTIVE 2D BOTANICAL CANVAS ENGINE WITH SPRING PHYSICS & PHOTOTROPISM
+       ========================================================================== */
+    let canvas, ctx;
+    let sunAngle = 120;
+    let leafWilting = 0;
+    let particles = [];
+    
+    let leaves = [
+        { id: 1, relX: -70, relY: -160, baseAngle: -0.4, currentAngle: -0.4, angleVel: 0, length: 80, pruned: false },
+        { id: 2, relX: 70, relY: -200, baseAngle: 0.4, currentAngle: 0.4, angleVel: 0, length: 90, pruned: false },
+        { id: 3, relX: -40, relY: -240, baseAngle: -0.2, currentAngle: -0.2, angleVel: 0, length: 75, pruned: false },
+        { id: 4, relX: 45, relY: -270, baseAngle: 0.3, currentAngle: 0.3, angleVel: 0, length: 85, pruned: false }
+    ];
+
+    let draggedLeaf = null;
+    let isDragging = false;
+
+    function initCanvasEngine() {
+        canvas = document.getElementById('botanicalCanvas');
+        ctx = canvas.getContext('2d');
+
+        canvas.addEventListener('mousedown', handleCanvasDown);
+        canvas.addEventListener('mousemove', handleCanvasMove);
+        window.addEventListener('mouseup', handleCanvasUp);
+
+        canvas.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            handleCanvasDown({ clientX: touch.clientX, clientY: touch.clientY });
+        });
+        canvas.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            handleCanvasMove({ clientX: touch.clientX, clientY: touch.clientY });
+        });
+        window.addEventListener('touchend', handleCanvasUp);
+
+        requestAnimationFrame(renderCanvasLoop);
+    }
+
+    function renderCanvasLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const centerX = canvas.width / 2;
+        const bottomY = canvas.height - 40;
+
+        drawSunRays(centerX, bottomY);
+
+        ctx.fillStyle = '#C66A51';
+        ctx.beginPath();
+        ctx.moveTo(centerX - 60, bottomY);
+        ctx.lineTo(centerX + 60, bottomY);
+        ctx.lineTo(centerX + 72, bottomY - 110);
+        ctx.lineTo(centerX - 72, bottomY - 110);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#B25A42';
+        ctx.fillRect(centerX - 78, bottomY - 122, 156, 14);
+
+        ctx.strokeStyle = '#0D1F17';
+        ctx.lineWidth = 7;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(centerX, bottomY - 122);
+        ctx.quadraticCurveTo(centerX + (sunAngle - 180) * 0.1, bottomY - 220, centerX, bottomY - 300);
+        ctx.stroke();
+
+        const phototropismOffset = (sunAngle - 180) * 0.002;
+
+        leaves.forEach(leaf => {
+            if (leaf.pruned) return;
+
+            if (draggedLeaf !== leaf) {
+                const targetAngle = leaf.baseAngle + (leafWilting * 0.6) + phototropismOffset;
+                const force = (targetAngle - leaf.currentAngle) * 0.08;
+                leaf.angleVel = (leaf.angleVel + force) * 0.82;
+                leaf.currentAngle += leaf.angleVel;
+            }
+
+            ctx.save();
+            ctx.translate(centerX, bottomY - 180 + (leaf.relY * 0.3));
+            ctx.rotate(leaf.currentAngle);
+
+            if (leafWilting > 0.6) {
+                ctx.fillStyle = '#94A3B8';
+            } else if (leafWilting > 0.3) {
+                ctx.fillStyle = '#7A9A8B';
+            } else {
+                ctx.fillStyle = '#183125';
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.quadraticCurveTo(60, -40, leaf.length, 10);
+            ctx.quadraticCurveTo(30, 45, 0, 0);
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(250, 248, 245, 0.3)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(leaf.length * 0.8, 5);
+            ctx.stroke();
+
+            ctx.restore();
+        });
+
+        particles.forEach((p, idx) => {
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            p.x += p.speedX;
+            p.y += p.speedY;
+            p.alpha -= 0.02;
+
+            if (p.alpha <= 0 || p.y > canvas.height) particles.splice(idx, 1);
+        });
+
+        requestAnimationFrame(renderCanvasLoop);
+    }
+
+    function drawSunRays(centerX, bottomY) {
+        const rad = (sunAngle * Math.PI) / 180;
+        const sunX = centerX + Math.cos(rad) * 200;
+        const sunY = 70 + Math.sin(rad) * 30;
+
+        ctx.fillStyle = 'rgba(212, 175, 55, 0.85)';
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(212, 175, 55, 0.05)';
+        ctx.beginPath();
+        ctx.moveTo(sunX, sunY);
+        ctx.lineTo(centerX - 120, bottomY);
+        ctx.lineTo(centerX + 120, bottomY);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function handleCanvasDown(e) {
+        leaves.forEach(leaf => {
+            if (!leaf.pruned) {
+                draggedLeaf = leaf;
+                isDragging = true;
+            }
+        });
+    }
+
+    function handleCanvasMove(e) {
+        if (!isDragging || !draggedLeaf) return;
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const deltaX = (mouseX - canvas.width / 2) * 0.005;
+        draggedLeaf.currentAngle = deltaX;
+    }
+
+    function handleCanvasUp() {
+        isDragging = false;
+        draggedLeaf = null;
+    }
+
+    function updateSunPosition(val) {
+        sunAngle = parseInt(val);
+        document.getElementById('sunPosLabel').innerText = `${sunAngle}° Azimute`;
+        document.getElementById('canvasLightAngle').innerText = `+${sunAngle - 180}° Tilt`;
+        playSynthSound('pop');
+    }
+
+    function interactCanvas(type) {
+        playSynthSound(type);
+
+        if (type === 'water') {
+            for (let i = 0; i < 30; i++) {
+                particles.push({
+                    x: canvas.width / 2 + (Math.random() * 120 - 60),
+                    y: 40 + Math.random() * 40,
+                    speedX: (Math.random() - 0.5) * 1.5,
+                    speedY: 3 + Math.random() * 4,
+                    size: 3 + Math.random() * 2,
+                    color: 'rgba(59, 130, 246, 0.75)',
+                    alpha: 1
+                });
+            }
+            updateGlobalSimulation(92);
+            document.getElementById('simMoistureSlider').value = 92;
+        } else if (type === 'fertilize') {
+            for (let i = 0; i < 25; i++) {
+                particles.push({
+                    x: canvas.width / 2 + (Math.random() * 140 - 70),
+                    y: canvas.height - 160 + Math.random() * 30,
+                    speedX: (Math.random() - 0.5) * 2,
+                    speedY: -1 - Math.random() * 2,
+                    size: 3.5,
+                    color: 'rgba(212, 175, 55, 0.9)',
+                    alpha: 1
+                });
+            }
+        } else if (type === 'prune') {
+            const active = leaves.filter(l => !l.pruned);
+            if (active.length > 0) {
+                active[active.length - 1].pruned = true;
+            } else {
+                leaves.forEach(l => l.pruned = false);
+            }
+        }
+    }
+
+    function updateTimelinePrediction(day) {
+        document.getElementById('timelineDayLabel').innerText = `Dia ${day}`;
+        leafWilting = Math.min(1, day / 25);
+
+        const statusElem = document.getElementById('canvasLeafStatus');
+        const turgorElem = document.getElementById('canvasTurgorDisplay');
+        const desc = document.getElementById('timelineDescription');
+
+        const turgorVal = (1 - (leafWilting * 0.75)).toFixed(2);
+        turgorElem.innerText = turgorVal;
+
+        if (day > 18) {
+            statusElem.innerText = "Estresse Hídrico Crítico";
+            statusElem.className = "text-terracotta font-bold";
+            desc.innerText = "Perda severa de turgor celular. Necrose foliar nas extremidades.";
+        } else if (day > 8) {
+            statusElem.innerText = "Murchamento Leve";
+            statusElem.className = "text-amber-600 font-bold";
+            desc.innerText = "Início de curvatura foliar por falta de transpiração hidráulica.";
+        } else {
+            statusElem.innerText = "Turgida & Saúdavel";
+            statusElem.className = "text-emerald-700 font-bold";
+            desc.innerText = "Células parenquimáticas hidratadas mantendo sustentação mecânica ideal.";
+        }
+    }
+
+    function scrollToCanvasAndFocus() {
+        document.getElementById('atelie-canvas').scrollIntoView({ behavior: 'smooth' });
+        interactCanvas('water');
+    }
+
+    /* ==========================================================================
+       AI DIAGNOSTIC SCANNER & HOTSPOTS
+       ========================================================================== */
+    function loadScannerSample(sampleKey) {
+        playSynthSound('scan');
+        const container = document.getElementById('scanPreviewContainer');
+        const img = document.getElementById('scanPreviewImg');
+        const laser = document.getElementById('laserBeam');
+        const h1 = document.getElementById('lesionHotspot1');
+        const h2 = document.getElementById('lesionHotspot2');
+
+        document.getElementById('uploadPlaceholder').classList.add('hidden');
+        container.classList.remove('hidden');
+        laser.classList.remove('hidden');
+
+        if (sampleKey === 'sample1') {
+            img.src = 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=800&q=80';
+        } else {
+            img.src = 'https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&w=800&q=80';
+        }
+
+        setTimeout(() => {
+            laser.classList.add('hidden');
+            h1.classList.remove('hidden');
+            h2.classList.remove('hidden');
+            document.getElementById('scanResultPanel').classList.remove('hidden');
+        }, 2200);
+    }
+
+    function selectHotspot(num, e) {
+        e.stopPropagation();
+        playSynthSound('pop');
+        if (num === 1) {
+            document.getElementById('diagTitle').innerText = "Hotspot #01 - Foco Necrótico";
+            document.getElementById('diagIssueText').innerText = "Clorose por Falta de Magnésio (Mg²⁺)";
+            document.getElementById('diagTreatmentText').innerText = "Aplicações de quelato de magnésio diretamente no vaso.";
+        } else {
+            document.getElementById('diagTitle').innerText = "Hotspot #02 - Borda Foliar";
+            document.getElementById('diagIssueText').innerText = "Queima por Ar Seco (Umidade Rela. < 35%)";
+            document.getElementById('diagTreatmentText').innerText = "Aumente a borrifada de névoa fina nos horários amenos.";
+        }
+    }
+
+    function triggerPhotoUpload() {
+        document.getElementById('leafFileInput').click();
+    }
+
+    function handleLeafUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            document.getElementById('uploadPlaceholder').classList.add('hidden');
+            const container = document.getElementById('scanPreviewContainer');
+            const img = document.getElementById('scanPreviewImg');
+            const laser = document.getElementById('laserBeam');
+
+            img.src = evt.target.result;
+            container.classList.remove('hidden');
+            laser.classList.remove('hidden');
+
+            setTimeout(() => {
+                laser.classList.add('hidden');
+                document.getElementById('scanResultPanel').classList.remove('hidden');
+                playSynthSound('scan');
+            }, 2200);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function resetScanner() {
+        document.getElementById('uploadPlaceholder').classList.remove('hidden');
+        document.getElementById('scanPreviewContainer').classList.add('hidden');
+        document.getElementById('scanResultPanel').classList.add('hidden');
+        document.getElementById('lesionHotspot1').classList.add('hidden');
+        document.getElementById('lesionHotspot2').classList.add('hidden');
+    }
+
+    /* ==========================================================================
+       TELEMETRY DASHBOARD & EMULATOR CONTROLS
+       ========================================================================== */
+    function renderPlants() {
+        const grid = document.getElementById('plantGrid');
+        grid.innerHTML = plants.map(plant => {
+            const isCritical = plant.moisture < 25;
+            return `
+                <div class="glass-card rounded-2xl overflow-hidden shadow-editorial transition-all duration-300 hover:-translate-y-1 hover:shadow-editorial-lg">
+                    <div class="relative h-52">
+                        <img src="${plant.image}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-forest/80 via-transparent to-transparent"></div>
+                        <span class="absolute top-3 right-3 font-mono text-[9px] px-2.5 py-1 rounded-full ${isCritical ? 'bg-terracotta text-white animate-pulse' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}">
+                            ${isCritical ? 'UMIDADE CRÍTICA' : 'SAUDÁVEL'}
+                        </span>
+                        <div class="absolute bottom-3 left-4 text-alabaster">
+                            <h3 class="font-serif text-lg font-bold">${plant.name}</h3>
+                            <p class="text-[10px] font-mono text-sage italic">${plant.species}</p>
+                        </div>
+                    </div>
+
+                    <div class="p-5 space-y-4 font-mono text-xs">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-alabasterSoft/60 p-3 rounded-xl fine-border">
+                                <span class="text-sage block text-[9px] uppercase">Umidade Solo</span>
+                                <span id="plant-moisture-${plant.id}" class="text-sm font-bold ${isCritical ? 'text-terracotta' : 'text-forest'}">${plant.moisture}%</span>
+                                <div class="w-full h-1 bg-sageLight rounded-full mt-1.5 overflow-hidden">
+                                    <div id="plant-bar-${plant.id}" class="h-full ${isCritical ? 'bg-terracotta' : 'bg-forest'} rounded-full transition-all duration-300" style="width: ${plant.moisture}%"></div>
+                                </div>
+                            </div>
+
+                            <div class="bg-alabasterSoft/60 p-3 rounded-xl fine-border">
+                                <span class="text-sage block text-[9px] uppercase">Temperatura</span>
+                                <span id="plant-temp-${plant.id}" class="text-sm font-bold text-forest">${plant.temp}°C</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center text-[10px] text-sage pt-1 fine-border-t">
+                            <span>Node: ${plant.espId}</span>
+                            <span>Bateria: ${plant.battery}%</span>
+                        </div>
+
+                        <div class="flex gap-2 pt-1">
+                            <button onclick="waterSinglePlant(${plant.id})" class="flex-1 py-2.5 bg-forest text-alabaster rounded-xl text-[10px] font-bold uppercase tracking-wider hover:bg-terracotta transition-colors flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-droplet text-terracotta"></i>
+                                <span>Irrigar Node</span>
+                            </button>
+                            <button onclick="openTelemetryModal(${plant.id})" class="px-3.5 py-2.5 fine-border text-forest rounded-xl hover:bg-forest/5">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function waterSinglePlant(id) {
+        // Não simular aumento de umidade: o sensor real confirmará a mudança.
+        triggerGlobalIrrigation();
+    }
+
+    function updateGlobalSimulation(val) {
+        document.getElementById('simMoistureValue').innerText = val + '%';
+        plants[0].moisture = parseInt(val);
+        renderPlants();
+        updateTimelinePrediction(Math.max(0, Math.floor((100 - val) / 3)));
+        document.getElementById('heroMoistureDisplay').innerText = val + '%';
+    }
+
+    function updateLightSimulation(val) {
+        document.getElementById('simLightValue').innerText = val + ' Ix';
+        plants[0].light = parseInt(val);
+        document.getElementById('heroLuxDisplay').innerText = val + ' Ix';
+    }
+
+async function triggerGlobalIrrigation() {
+    if (typeof window.controlarBombaRemota !== 'function') {
+        alert('Firebase ainda não está pronto. Confira a configuração e as regras do banco.');
+        return;
+    }
+    // Envia apenas o comando real para o Firebase, sem simulações visuais
+    await window.controlarBombaRemota(true);
+}
+    async function desligarBombaInterface() {
+        if (typeof window.controlarBombaRemota !== 'function') {
+            alert('Firebase ainda não está pronto. Confira a configuração e as regras do banco.');
+            return;
+        }
+        await window.controlarBombaRemota(false);
+    }
+
+    function atualizarStatusBomba(ligada) {
+        const el = document.getElementById('pumpStatusText');
+        if (!el) return;
+        el.textContent = ligada ? 'LIGADA' : 'DESLIGADA';
+        el.className = ligada ? 'text-emerald-300 font-bold' : 'text-sage font-bold';
+    }
+
+    function toggleTelemetryStream() {
+        isStreamingActive = !isStreamingActive;
+        const btnText = document.getElementById('streamStatusText');
+        if (isStreamingActive) {
+            btnText.innerText = "Stream em Tempo Real: ATIVO";
+            playSynthSound('pop');
+        } else {
+            btnText.innerText = "Stream em Tempo Real: PAUSADO";
+            playSynthSound('pop');
+        }
+    }
+
+    setInterval(() => {
+        if (!isStreamingActive) return;
+        plants = plants.map(p => {
+            const jitter = (Math.random() - 0.5) * 0.6;
+            p.temp = parseFloat((p.temp + jitter * 0.1).toFixed(1));
+            return p;
+        });
+        const heroTemp = document.getElementById('heroTempDisplay');
+        if (heroTemp) heroTemp.innerText = plants[0].temp + '°C';
+    }, 3000);
+
+    /* ==========================================================================
+       E-COMMERCE & CART DRAWER
+       ========================================================================== */
+    function renderProducts(cat, btnElem) {
+        if (btnElem) {
+            document.querySelectorAll('.product-tab').forEach(b => {
+                b.className = "px-4 py-2 rounded-full text-xs font-mono font-medium fine-border text-forest hover:bg-forest hover:text-alabaster transition-colors product-tab";
+            });
+            btnElem.className = "px-4 py-2 rounded-full text-xs font-mono font-medium bg-forest text-alabaster product-tab";
+        }
+
+        const grid = document.getElementById('productsGrid');
+        const filtered = cat === 'all' ? products : products.filter(p => p.category === cat);
+
+        grid.innerHTML = filtered.map(p => `
+            <div class="glass-card rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between hover:shadow-editorial transition-all tilt-card">
+                <div>
+                    <div class="h-44 overflow-hidden relative">
+                        <img src="${p.image}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-4 space-y-1">
+                        <h4 class="font-serif font-bold text-forest text-sm">${p.name}</h4>
+                        <p class="font-mono text-terracotta text-sm font-bold">R$ ${p.price.toFixed(2)}</p>
+                    </div>
+                </div>
+                <div class="p-4 pt-0">
+                    <button onclick="addToCart(${p.id})" class="w-full py-2.5 bg-forest text-alabaster text-[10px] uppercase font-mono font-bold rounded-xl hover:bg-terracotta transition-colors">
+                        Adicionar ao Carrinho
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function filterProducts(cat, elem) {
+        playSynthSound('pop');
+        renderProducts(cat, elem);
+    }
+
+    function addToCart(id) {
+        playSynthSound('pop');
+        const prod = products.find(p => p.id === id);
+        cart.push(prod);
+        updateCartUI();
+        toggleCartDrawer();
+    }
+
+    function updateCartUI() {
+        document.getElementById('cartBadge').innerText = cart.length;
+        const list = document.getElementById('cartItemsList');
+        const total = cart.reduce((acc, item) => acc + item.price, 0);
+
+        list.innerHTML = cart.map((item, idx) => `
+            <div class="flex items-center justify-between p-3 bg-white rounded-xl fine-border text-xs font-mono">
+                <div>
+                    <span class="font-bold block">${item.name}</span>
+                    <span class="text-terracotta">R$ ${item.price.toFixed(2)}</span>
+                </div>
+                <button onclick="removeFromCart(${idx})" class="text-terracotta hover:text-terracottaHover"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        `).join('');
+
+        document.getElementById('cartTotalDisplay').innerText = `R$ ${total.toFixed(2)}`;
+
+        const freeThreshold = 500;
+        const diff = freeThreshold - total;
+        if (diff <= 0) {
+            document.getElementById('shippingText').innerText = "Você ganhou Frete Grátis!";
+            document.getElementById('shippingProgressBar').style.width = '100%';
+        } else {
+            document.getElementById('shippingText').innerText = `Faltam R$ ${diff.toFixed(2)} para Frete Grátis`;
+            document.getElementById('shippingProgressBar').style.width = `${Math.min(100, (total / freeThreshold) * 100)}%`;
+        }
+    }
+
+    function removeFromCart(idx) {
+        playSynthSound('pop');
+        cart.splice(idx, 1);
+        updateCartUI();
+    }
+
+    function copyPixCode() {
+        playSynthSound('pop');
+        alert('Código Pix copiado para a área de transferência!');
+    }
+
+    /* ==========================================================================
+       REVIEWS & STAR RATING PICKER
+       ========================================================================== */
+    function setStarRating(num) {
+        selectedRating = num;
+        playSynthSound('pop');
+        const picker = document.getElementById('starPicker');
+        picker.innerHTML = [1, 2, 3, 4, 5].map(i => `
+            <i class="fa-solid fa-star ${i <= num ? 'text-amber-400' : 'text-gray-300'}" onclick="setStarRating(${i})"></i>
+        `).join('');
+    }
+
+    function renderReviews() {
+        const feed = document.getElementById('reviewsFeed');
+        feed.innerHTML = reviews.map(r => `
+            <div class="p-4 rounded-2xl bg-white fine-border space-y-2">
+                <div class="flex justify-between items-center">
+                    <strong class="text-xs font-mono text-forest">${r.author}</strong>
+                    <div class="text-amber-500 text-xs">
+                        ${'★'.repeat(r.rating)}
+                    </div>
+                </div>
+                <p class="text-xs font-light text-forest/80 italic">"${r.text}"</p>
+            </div>
+        `).join('');
+    }
+
+    function submitReview(e) {
+        e.preventDefault();
+        playSynthSound('pop');
+        const author = document.getElementById('reviewAuthor').value;
+        const text = document.getElementById('reviewText').value;
+
+        reviews.unshift({ id: Date.now(), author, rating: selectedRating, text });
+        renderReviews();
+        e.target.reset();
+    }
+
+    /* ==========================================================================
+       ALERT CENTER & MODAL HANDLERS
+       ========================================================================== */
+    function renderAlerts() {
+        document.getElementById('alertBadge').innerText = alerts.length;
+        const list = document.getElementById('alertsList');
+        if (alerts.length === 0) {
+            list.innerHTML = `<p class="text-sage text-xs font-mono text-center py-4">Nenhum alerta pendente.</p>`;
+            return;
+        }
+        list.innerHTML = alerts.map(a => `
+            <div class="p-4 rounded-xl bg-white/5 border border-terracotta/40 space-y-2 font-mono text-xs">
+                <p class="text-alabaster">${a.message}</p>
+                <button onclick="waterSinglePlant(${a.plantId})" class="px-3 py-1.5 bg-terracotta text-white rounded text-[10px] font-bold uppercase hover:bg-terracottaHover transition-colors">Irrigar Agora 1-Clique</button>
+            </div>
+        `).join('');
+    }
+
+    function toggleAlertDrawer() {
+        playSynthSound('pop');
+        document.getElementById('alertDrawer').classList.toggle('hidden');
+    }
+
+    function toggleCartDrawer() {
+        playSynthSound('pop');
+        document.getElementById('cartDrawer').classList.toggle('hidden');
+    }
+
+    function openModal(id) {
+        playSynthSound('pop');
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+        playSynthSound('pop');
+        document.getElementById(id).classList.add('hidden');
+    }
+
+    function addNewPlant(e) {
+        e.preventDefault();
+        playSynthSound('pop');
+        const name = document.getElementById('newPlantName').value;
+        const species = document.getElementById('newPlantSpecies').value;
+        const espId = document.getElementById('newPlantEspId').value;
+        const img = document.getElementById('newPlantImg').value || 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=800&q=80';
+
+        plants.push({
+            id: Date.now(),
+            name, species, espId,
+            moisture: 60, temp: 22.5, light: 4100, battery: 100,
+            image: img
+        });
+
+        renderPlants();
+        closeModal('addPlantModal');
+    }
+
+    function openTelemetryModal(id) {
+        playSynthSound('pop');
+        const plant = plants.find(p => p.id === id);
+        document.getElementById('chartModalTitle').innerText = `Histórico - ${plant.name}`;
+        openModal('chartModal');
+
+        setTimeout(() => {
+            const ctxChart = document.getElementById('telemetryChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctxChart, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    datasets: [{
+                        label: 'Umidade do solo (%)',
+                        data: [plant.moisture - 10, plant.moisture - 6, plant.moisture - 2, plant.moisture, plant.moisture + 3, plant.moisture],
+                        borderColor: '#C66A51',
+                        backgroundColor: 'rgba(198, 106, 81, 0.12)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }, 100);
+    }
+
+    function openCheckoutModal() {
+        toggleCartDrawer();
+        openModal('checkoutModal');
+    }
+
+    function confirmOrder() {
+        playSynthSound('pop');
+        alert('Pagamento aprovado com sucesso! O Ateliê PlantaCerta enviará seu pedido.');
+        cart = [];
+        updateCartUI();
+        closeModal('checkoutModal');
+    }
+
+    /* ==========================================================================
+       GLOBAL ONLOAD INITIALIZATION
+       ========================================================================== */
+    window.onload = function() {
+        renderPlants();
+        renderProducts('all');
+        renderReviews();
+        renderAlerts();
+        initCanvasEngine();
+    };
+</script>
+
+<<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD33DJspc8TDiQnjrHUkEe0TYGE59E6YG8",
+      authDomain: "monitoramento-vini.firebaseapp.com",
+      databaseURL: "https://monitoramento-vini-default-rtdb.firebaseio.com",
+      projectId: "monitoramento-vini",
+      storageBucket: "monitoramento-vini.firebasestorage.app",
+      messagingSenderId: "491848279233",
+      appId: "1:491848279233:web:cebbe43bf842fe72e82040",
+      measurementId: "G-634B3FGXZJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const LIMIAR_SOLO_SECO = 30;
+
+    function atualizarAlertaSolo(umidade) {
+        const list = document.getElementById("alertsList");
+        const badge = document.getElementById("alertBadge");
+        const seco = umidade <= LIMIAR_SOLO_SECO;
+        if (badge) badge.textContent = seco ? "1" : "0";
+        if (!list) return;
+        if (seco) {
+            list.innerHTML = `
+              <div class="p-4 rounded-xl bg-white/5 border border-terracotta/60 space-y-3 font-mono text-xs">
+                <p class="text-terracotta font-bold"><i class="fa-solid fa-triangle-exclamation"></i> ALERTA DE SOLO SECO</p>
+                <p class="text-alabaster">A umidade está em ${umidade}%. O limite configurado é ${LIMIAR_SOLO_SECO}%.</p>
+                <button onclick="triggerGlobalIrrigation()" class="px-3 py-2 bg-terracotta text-white rounded text-[10px] font-bold uppercase hover:bg-terracottaHover transition-colors">Ativar bomba</button>
+              </div>`;
+        } else {
+            list.innerHTML = `<p class="text-sage text-xs font-mono text-center py-4">Umidade adequada (${umidade}%). Nenhum alerta.</p>`;
+        }
+    }
+
+    // Escuta a telemetria do ESP32 diretamente
+    onValue(ref(db, "leitura"), (snapshot) => {
+        const dados = snapshot.val();
+        if (!dados) return;
+        const umidade = Number(dados.umidade);
+        
+        if (Number.isFinite(umidade)) {
+            const hero = document.getElementById("heroMoistureDisplay");
+            const sim = document.getElementById("simMoistureValue");
+            const slider = document.getElementById("simMoistureSlider");
+            if (hero) hero.innerText = umidade + "%";
+            if (sim) sim.innerText = umidade + "%";
+            if (slider) slider.value = umidade;
+            
+            if (typeof plants !== "undefined" && plants.length) {
+                plants[0].moisture = umidade;
+                const el = document.getElementById("plant-moisture-1");
+                const bar = document.getElementById("plant-bar-1");
+                if (el) el.innerText = umidade + "%";
+                if (bar) bar.style.width = umidade + "%";
+            }
+            atualizarAlertaSolo(umidade);
+        }
+    }, (error) => {
+        console.error("Erro ao ler /leitura:", error);
+    });
+
+    // Escuta o estado da bomba enviado pelo ESP32
+    onValue(ref(db, "bomba/estado"), (snapshot) => {
+        const estado = snapshot.val();
+        if (typeof estado === "boolean" && typeof atualizarStatusBomba === "function") {
+            atualizarStatusBomba(estado);
+        }
+    }, (error) => console.error("Erro ao ler /bomba/estado:", error));
+
+    // Envia o comando de controlo para o ESP32
+    window.controlarBombaRemota = async function(ligar) {
+        try {
+            await update(ref(db, "comando"), {
+                ligar: Boolean(ligar),
+                atualizadoEm: Date.now(),
+                origem: "PlantaCerta Web"
+            });
+            console.log("Comando enviado ao Firebase:", ligar ? "LIGAR" : "DESLIGAR");
+            return true;
+        } catch (error) {
+            console.error("Falha ao enviar comando:", error);
+            alert("Não foi possível enviar comando ao Firebase. Verifique as regras do banco.");
+            return false;
+        }
+    };
+</script>
+</body>
+</html>
