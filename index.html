@@ -219,11 +219,11 @@
                         <div class="grid grid-cols-3 gap-2 text-center pt-1">
                             <div>
                                 <span class="text-white/50 block text-[9px] uppercase">Umidade</span>
-                                <span id="heroMoistureDisplay" class="text-sm font-bold text-alabaster">68%</span>
+                                <span id="heroMoistureDisplay" class="text-sm font-bold text-alabaster">--</span>
                             </div>
                             <div>
                                 <span class="text-white/50 block text-[9px] uppercase">Temp</span>
-                                <span id="heroTempDisplay" class="text-sm font-bold text-alabaster">22.8°C</span>
+                                <span id="heroTempDisplay" class="text-sm font-bold text-alabaster">--</span>
                             </div>
                             <div>
                                 <span class="text-white/50 block text-[9px] uppercase">Lux Solar</span>
@@ -280,9 +280,9 @@
             <div class="flex-1 space-y-1">
                 <div class="flex justify-between text-[11px] font-mono">
                     <span class="text-white/70">Solo (Umidade)</span>
-                    <span id="simMoistureValue" class="text-terracotta font-bold">68%</span>
+                    <span id="simMoistureValue" class="text-terracotta font-bold">--</span>
                 </div>
-                <input type="range" id="simMoistureSlider" min="0" max="100" value="68" oninput="document.getElementById('simMoistureValue').innerText = this.value + '% (simulação)'" class="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-terracotta">
+                <input type="range" id="simMoistureSlider" min="0" max="100" value="0" oninput="document.getElementById('simMoistureValue').innerText = this.value + '% (simulação)'" class="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-terracotta">
             </div>
             
             <div class="flex-1 space-y-1">
@@ -734,8 +734,8 @@
             name: 'Monstera Deliciosa',
             species: 'Monstera deliciosa',
             espId: 'ESP32-NODE-01',
-            moisture: 68,
-            temp: 22.8,
+            moisture: null,
+            temp: null,
             light: 4500,
             battery: 96,
             image: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=800&q=80'
@@ -746,7 +746,7 @@
             species: 'Ficus lyrata',
             espId: 'ESP32-NODE-02',
             moisture: 18,
-            temp: 24.3,
+            temp: null,
             light: 5900,
             battery: 82,
             image: 'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=800&q=80'
@@ -757,7 +757,7 @@
             species: 'Epipremnum pinnatum',
             espId: 'ESP32-NODE-03',
             moisture: 54,
-            temp: 21.5,
+            temp: null,
             light: 3100,
             battery: 90,
             image: 'https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&w=800&q=80'
@@ -1052,8 +1052,6 @@
                     alpha: 1
                 });
             }
-            updateGlobalSimulation(92);
-            document.getElementById('simMoistureSlider').value = 92;
         } else if (type === 'fertilize') {
             for (let i = 0; i < 25; i++) {
                 particles.push({
@@ -1192,14 +1190,15 @@
     function renderPlants() {
         const grid = document.getElementById('plantGrid');
         grid.innerHTML = plants.map(plant => {
-            const isCritical = plant.moisture < 25;
+            const temLeitura = Number.isFinite(plant.moisture);
+            const isCritical = temLeitura && plant.moisture < 25;
             return `
                 <div class="glass-card rounded-2xl overflow-hidden shadow-editorial transition-all duration-300 hover:-translate-y-1 hover:shadow-editorial-lg">
                     <div class="relative h-52">
                         <img src="${plant.image}" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-forest/80 via-transparent to-transparent"></div>
-                        <span class="absolute top-3 right-3 font-mono text-[9px] px-2.5 py-1 rounded-full ${isCritical ? 'bg-terracotta text-white animate-pulse' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}">
-                            ${isCritical ? 'UMIDADE CRÍTICA' : 'SAUDÁVEL'}
+                        <span class="absolute top-3 right-3 font-mono text-[9px] px-2.5 py-1 rounded-full ${isCritical ? 'bg-terracotta text-white animate-pulse' : (temLeitura ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-white/15 text-white border border-white/30')}">
+                            ${isCritical ? 'UMIDADE CRÍTICA' : (temLeitura ? 'SAUDÁVEL' : 'AGUARDANDO LEITURA')}
                         </span>
                         <div class="absolute bottom-3 left-4 text-alabaster">
                             <h3 class="font-serif text-lg font-bold">${plant.name}</h3>
@@ -1211,15 +1210,15 @@
                         <div class="grid grid-cols-2 gap-3">
                             <div class="bg-alabasterSoft/60 p-3 rounded-xl fine-border">
                                 <span class="text-sage block text-[9px] uppercase">Umidade Solo</span>
-                                <span id="plant-moisture-${plant.id}" class="text-sm font-bold ${isCritical ? 'text-terracotta' : 'text-forest'}">${plant.moisture}%</span>
+                                <span id="plant-moisture-${plant.id}" class="text-sm font-bold ${isCritical ? 'text-terracotta' : 'text-forest'}">${temLeitura ? plant.moisture + '%' : '--'}</span>
                                 <div class="w-full h-1 bg-sageLight rounded-full mt-1.5 overflow-hidden">
-                                    <div id="plant-bar-${plant.id}" class="h-full ${isCritical ? 'bg-terracotta' : 'bg-forest'} rounded-full transition-all duration-300" style="width: ${plant.moisture}%"></div>
+                                    <div id="plant-bar-${plant.id}" class="h-full ${isCritical ? 'bg-terracotta' : 'bg-forest'} rounded-full transition-all duration-300" style="width: ${temLeitura ? plant.moisture : 0}%"></div>
                                 </div>
                             </div>
 
                             <div class="bg-alabasterSoft/60 p-3 rounded-xl fine-border">
                                 <span class="text-sage block text-[9px] uppercase">Temperatura</span>
-                                <span id="plant-temp-${plant.id}" class="text-sm font-bold text-forest">${plant.temp}°C</span>
+                                <span id="plant-temp-${plant.id}" class="text-sm font-bold text-forest">${Number.isFinite(plant.temp) ? plant.temp.toFixed(1) + '°C' : '--'}</span>
                             </div>
                         </div>
 
@@ -1296,17 +1295,6 @@ async function triggerGlobalIrrigation() {
             playSynthSound('pop');
         }
     }
-
-    setInterval(() => {
-        if (!isStreamingActive) return;
-        plants = plants.map(p => {
-            const jitter = (Math.random() - 0.5) * 0.6;
-            p.temp = parseFloat((p.temp + jitter * 0.1).toFixed(1));
-            return p;
-        });
-        const heroTemp = document.getElementById('heroTempDisplay');
-        if (heroTemp) heroTemp.innerText = plants[0].temp + '°C';
-    }, 3000);
 
     /* ==========================================================================
        E-COMMERCE & CART DRAWER
@@ -1481,7 +1469,7 @@ async function triggerGlobalIrrigation() {
         plants.push({
             id: Date.now(),
             name, species, espId,
-            moisture: 60, temp: 22.5, light: 4100, battery: 100,
+            moisture: 60, temp: null, light: 4100, battery: 100,
             image: img
         });
 
@@ -1542,7 +1530,7 @@ async function triggerGlobalIrrigation() {
     };
 </script>
 
-<<script type="module">
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -1560,14 +1548,21 @@ async function triggerGlobalIrrigation() {
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const LIMIAR_SOLO_SECO = 30;
+    const RAW_SATURADO = 4090;   // ADC de 12 bits satura em 4095
 
-    function atualizarAlertaSolo(umidade) {
+    function atualizarAlertaSolo(umidade, saturado) {
         const list = document.getElementById("alertsList");
         const badge = document.getElementById("alertBadge");
         const seco = umidade <= LIMIAR_SOLO_SECO;
-        if (badge) badge.textContent = seco ? "1" : "0";
+        if (badge) badge.textContent = (seco || saturado) ? "1" : "0";
         if (!list) return;
-        if (seco) {
+        if (saturado) {
+            list.innerHTML = `
+              <div class="p-4 rounded-xl bg-white/5 border border-terracotta/60 space-y-3 font-mono text-xs">
+                <p class="text-terracotta font-bold"><i class="fa-solid fa-triangle-exclamation"></i> LEITURA DO SENSOR SATURADA</p>
+                <p class="text-alabaster">O sensor de solo retornou o valor máximo (4095): está fora do solo, desconectado ou com sinal acima de 3,3 V. A umidade foi zerada na tela. Confira o fio AOUT e a alimentação do sensor.</p>
+              </div>`;
+        } else if (seco) {
             list.innerHTML = `
               <div class="p-4 rounded-xl bg-white/5 border border-terracotta/60 space-y-3 font-mono text-xs">
                 <p class="text-terracotta font-bold"><i class="fa-solid fa-triangle-exclamation"></i> ALERTA DE SOLO SECO</p>
@@ -1579,11 +1574,35 @@ async function triggerGlobalIrrigation() {
         }
     }
 
+    // Temperatura do ar (/leitura/temperaturaAr, em °C). Valor ausente ou inválido vira "--".
+    function atualizarTemperatura(bruto) {
+        const valido = bruto !== null && bruto !== undefined && bruto !== "";
+        const t = valido ? Number(bruto) : NaN;
+        const ok = Number.isFinite(t) && t > -40 && t < 100;   // descarta falhas de leitura do DHT
+        const texto = ok ? t.toFixed(1) + "°C" : "--";
+        const hero = document.getElementById("heroTempDisplay");
+        if (hero) hero.innerText = texto;
+        if (typeof plants !== "undefined" && plants.length) {
+            plants[0].temp = ok ? t : null;
+            const el = document.getElementById("plant-temp-1");
+            if (el) el.innerText = texto;
+        }
+    }
+
     // Escuta a telemetria do ESP32 diretamente
     onValue(ref(db, "leitura"), (snapshot) => {
         const dados = snapshot.val();
-        if (!dados) return;
-        const umidade = Number(dados.umidade);
+        console.log("Firebase /leitura:", dados);
+        if (!dados) {
+            console.warn("Firebase: o nó /leitura está vazio. O ESP32 ainda não enviou dados.");
+            return;
+        }
+        // rawSolo = 4095 é leitura saturada do ADC (sensor fora do solo, desconectado ou sinal acima de 3,3 V).
+        // Isso não é umidade real, então a tela mostra 0%.
+        const rawSolo = (dados.rawSolo === null || dados.rawSolo === undefined || dados.rawSolo === "") ? NaN : Number(dados.rawSolo);
+        const sensorSaturado = Number.isFinite(rawSolo) && rawSolo >= RAW_SATURADO;
+        const umidade = sensorSaturado ? 0
+            : ((dados.umidade === null || dados.umidade === undefined || dados.umidade === "") ? NaN : Number(dados.umidade));
         
         if (Number.isFinite(umidade)) {
             const hero = document.getElementById("heroMoistureDisplay");
@@ -1600,8 +1619,26 @@ async function triggerGlobalIrrigation() {
                 if (el) el.innerText = umidade + "%";
                 if (bar) bar.style.width = umidade + "%";
             }
-            atualizarAlertaSolo(umidade);
+            atualizarAlertaSolo(umidade, sensorSaturado);
+        } else {
+            const hero = document.getElementById("heroMoistureDisplay");
+            const sim = document.getElementById("simMoistureValue");
+            if (hero) hero.innerText = "--";
+            if (sim) sim.innerText = "--";
+            if (typeof plants !== "undefined" && plants.length) plants[0].moisture = null;
         }
+
+        // O ESP32 grava a temperatura do ar em "temperaturaAr" (aceita também "temperatura" e "temp")
+        const tempBruta = [dados.temperaturaAr, dados.temperatura, dados.temp].find(v => v !== undefined && v !== null && v !== "");
+        atualizarTemperatura(tempBruta);
+
+        // O ESP32 informa o estado da bomba em /leitura/bombaLigada
+        if (typeof dados.bombaLigada === "boolean" && typeof atualizarStatusBomba === "function") {
+            atualizarStatusBomba(dados.bombaLigada);
+        }
+
+        // redesenha o cartão para atualizar também a barra e o selo (SAUDÁVEL / CRÍTICA)
+        if (typeof renderPlants === "function") renderPlants();
     }, (error) => {
         console.error("Erro ao ler /leitura:", error);
     });
